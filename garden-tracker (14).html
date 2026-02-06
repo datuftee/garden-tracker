@@ -1,0 +1,2582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Garden Tracker">
+    <meta name="theme-color" content="#27ae60">
+    <meta name="description" content="Track and nurture your garden with ease">
+    <title>My Garden Tracker</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdhcmRlbiBUcmFja2VyIiwKICAic2hvcnRfbmFtZSI6ICJHYXJKZW4iLAogICJkZXNjcmlwdGlvbiI6ICJUcmFjayBhbmQgbnVydHVyZSB5b3VyIGdhcmRlbiB3aXRoIGVhc2UiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZmZmZmZiIsCiAgInRoZW1lX2NvbG9yIjogIiMyN2FlNjAiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnJTNFJTNDcmVjdCBmaWxsPSclMjMyN2FlNjAnIHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJy8lM0UlM0N0ZXh0IHg9JzUwJTI1JyB5PSc1MCUyNScgZm9udC1zaXplPSc1MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZHk9Jy4zZW0nJTNFJUYwJTlGJThDJUIxJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfSwKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnJTNFJTNDcmVjdCBmaWxsPSclMjMyN2FlNjAnIHdpZHRoPScxMDAnIGhlaWdodD0nMTAwJy8lM0UlM0N0ZXh0IHg9JzUwJTI1JyB5PSc1MCUyNScgZm9udC1zaXplPSc1MCcgdGV4dC1hbmNob3I9J21pZGRsZScgZHk9Jy4zZW0nJTNFJUYwJTlGJThDJUIxJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .user-profile {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            color: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .login-btn {
+            padding: 10px 25px;
+            background: white;
+            color: #27ae60;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #95a5a6;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        .modal h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 90px;
+            right: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 10px;
+            min-width: 200px;
+            display: none;
+            z-index: 100;
+        }
+
+        .user-dropdown.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 5px 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .nav-tab {
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #27ae60;
+            border-color: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .sidebar {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .add-plant-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: transform 0.2s;
+        }
+
+        .add-plant-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .plant-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .plant-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .plant-item:hover {
+            border-color: #2ecc71;
+            transform: translateX(5px);
+        }
+
+        .plant-item.active {
+            border-color: #2ecc71;
+            background: #e8f8f5;
+        }
+
+        .plant-item h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .plant-item p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state svg {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2ecc71;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2ecc71;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .photo-upload {
+            border: 3px dashed #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .photo-upload:hover {
+            border-color: #2ecc71;
+            background: #f8f9fa;
+        }
+
+        .photo-upload input {
+            display: none;
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .plant-detail {
+            display: none;
+        }
+
+        .plant-detail.active {
+            display: block;
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .detail-header h2 {
+            color: #2c3e50;
+            font-size: 2em;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            border-color: #2ecc71;
+            background: #f8f9fa;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .info-card h4 {
+            color: #7f8c8d;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-card p {
+            color: #2c3e50;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .maintenance-log {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .maintenance-log h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .log-entry {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .log-entry-date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .log-entry-text {
+            color: #2c3e50;
+        }
+
+        .add-log-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            color: #7f8c8d;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .add-log-btn:hover {
+            border-color: #2ecc71;
+            color: #2ecc71;
+        }
+
+        .garden-section {
+            display: block;
+        }
+
+        .garden-section.active {
+            display: block;
+        }
+
+        .community-section {
+            display: none;
+        }
+
+        .community-section.active {
+            display: block;
+        }
+
+        .community-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .community-header h2 {
+            color: #2c3e50;
+            font-size: 2em;
+        }
+
+        .post-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .post-card:hover {
+            border-color: #2ecc71;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-author {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 3px;
+        }
+
+        .post-date {
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+
+        .post-content {
+            margin-bottom: 15px;
+        }
+
+        .post-title {
+            font-size: 1.3em;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .post-text {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .post-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .post-images img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .post-tag {
+            background: #e8f8f5;
+            color: #27ae60;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .post-action-btn {
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.2s;
+            padding: 10px 15px;
+            min-height: 44px;
+            border-radius: 8px;
+        }
+
+        .post-action-btn:hover {
+            color: #2ecc71;
+            background: #f8f9fa;
+        }
+
+        .post-action-btn.liked {
+            color: #e74c3c;
+        }
+
+        /* Better touch targets for mobile */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"],
+        select,
+        textarea {
+            min-height: 48px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        .add-plant-btn,
+        .login-btn,
+        .nav-tab,
+        .auth-tab {
+            min-height: 48px;
+        }
+
+        .comments-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+        }
+
+        .comments-section.active {
+            display: block;
+        }
+
+        .comment {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .comment-date {
+            color: #95a5a6;
+            font-size: 0.8em;
+        }
+
+        .comment-text {
+            color: #34495e;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .comment-input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: #2ecc71;
+        }
+
+        .comment-submit-btn {
+            padding: 10px 20px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .comment-submit-btn:hover {
+            background: #27ae60;
+        }
+
+        .new-post-form {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .new-post-form h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .community-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .community-grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .community-left {
+            position: sticky;
+            top: 20px;
+        }
+
+        .community-right {
+            min-height: 500px;
+        }
+
+        .community-posts {
+            width: 100%;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+                padding: 20px;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+
+            .nav-tab {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+
+            .community-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .community-left {
+                position: static;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 0.95em;
+            }
+
+            .user-profile {
+                top: 20px;
+                right: 20px;
+            }
+
+            .user-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1em;
+            }
+
+            .login-btn {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                max-width: 95%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-actions {
+                flex-wrap: wrap;
+            }
+
+            .btn-icon {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .post-images {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .container {
+                border-radius: 0;
+            }
+
+            body {
+                padding: 0;
+            }
+
+            .comment-input-wrapper {
+                flex-direction: column;
+            }
+
+            .comment-submit-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .nav-tab {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+            .user-dropdown {
+                right: 10px;
+                left: 10px;
+                width: auto;
+            }
+
+            .post-card {
+                padding: 15px;
+            }
+
+            .post-images {
+                grid-template-columns: 1fr;
+            }
+
+            .new-post-form {
+                padding: 20px 15px;
+            }
+
+            .content-area {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 My Garden Tracker</h1>
+            <p>Track and nurture your garden with ease</p>
+            
+            <!-- User Profile / Login -->
+            <div class="user-profile" id="userProfile">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('garden')">My Garden</button>
+                <button class="nav-tab" onclick="switchTab('community')">Community Forum</button>
+            </div>
+        </div>
+
+        <!-- Login/Signup Modal -->
+        <div class="modal" id="authModal">
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+                <h2>Welcome to Garden Tracker</h2>
+                
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+                    <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <div class="auth-form active" id="loginForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                    </div>
+                    <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 20px;">Login</button>
+                </div>
+
+                <!-- Signup Form -->
+                <div class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="signupUsername" placeholder="Choose a username">
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password">
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>Confirm Password</label>
+                        <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
+                    </div>
+                    <button class="btn btn-primary" onclick="handleSignup()" style="width: 100%; margin-top: 20px;">Sign Up</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Dropdown -->
+        <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-item" onclick="viewProfile()">
+                👤 My Profile
+            </div>
+            <div class="dropdown-item" onclick="viewSettings()">
+                ⚙️ Settings
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" onclick="handleLogout()">
+                🚪 Logout
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar" id="gardenSidebar">
+                <button class="add-plant-btn" onclick="showAddPlantForm()">+ Add New Plant</button>
+                <div class="plant-list" id="plantList">
+                    <!-- Plant items will be added here -->
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Garden Section -->
+                <div id="gardenSection" class="garden-section active">
+                    <div class="empty-state" id="emptyState">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,20A7,7 0 0,1 5,13A7,7 0 0,1 12,6A7,7 0 0,1 19,13A7,7 0 0,1 12,20M12,4A9,9 0 0,0 3,13A9,9 0 0,0 12,22A9,9 0 0,0 21,13A9,9 0 0,0 12,4M12.5,8H11V14L15.75,16.85L16.5,15.62L12.5,13.25V8M7.88,3.39L6.6,1.86L2,5.71L3.29,7.24L7.88,3.39M22,5.72L17.4,1.86L16.11,3.39L20.71,7.25L22,5.72Z" />
+                        </svg>
+                        <h2>Welcome to Your Garden!</h2>
+                        <p>Click "Add New Plant" to start tracking your garden</p>
+                    </div>
+
+                    <div class="form-container" id="plantForm">
+                        <h2 style="color: #2c3e50; margin-bottom: 30px;">Add New Plant</h2>
+                    
+                    <div class="form-section">
+                        <h2>Basic Information</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Plant Name *</label>
+                                <input type="text" id="plantName" placeholder="e.g., Tomato" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Plant Type</label>
+                                <select id="plantType">
+                                    <option value="">Select type...</option>
+                                    <option value="vegetable">Vegetable</option>
+                                    <option value="fruit">Fruit</option>
+                                    <option value="herb">Herb</option>
+                                    <option value="flower">Flower</option>
+                                    <option value="shrub">Shrub</option>
+                                    <option value="tree">Tree</option>
+                                    <option value="succulent">Succulent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Plant Lifecycle</label>
+                                <select id="plantLifecycle">
+                                    <option value="">Select lifecycle...</option>
+                                    <option value="annual">Annual</option>
+                                    <option value="perennial">Perennial</option>
+                                    <option value="biennial">Biennial</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Planting Date</label>
+                                <input type="date" id="plantingDate">
+                            </div>
+                            <div class="form-group">
+                                <label>Hardiness Zone <a href="https://planthardiness.ars.usda.gov/" target="_blank" style="color: #2ecc71; font-size: 0.85em; font-weight: normal;">(Find yours)</a></label>
+                                <select id="hardinessZone">
+                                    <option value="">Select zone...</option>
+                                    <option value="1">Zone 1 (coldest)</option>
+                                    <option value="2">Zone 2</option>
+                                    <option value="3">Zone 3</option>
+                                    <option value="4">Zone 4</option>
+                                    <option value="5">Zone 5</option>
+                                    <option value="6">Zone 6</option>
+                                    <option value="7">Zone 7</option>
+                                    <option value="8">Zone 8</option>
+                                    <option value="9">Zone 9</option>
+                                    <option value="10">Zone 10</option>
+                                    <option value="11">Zone 11</option>
+                                    <option value="12">Zone 12</option>
+                                    <option value="13">Zone 13 (warmest)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Location</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" id="city" placeholder="e.g., Portland">
+                            </div>
+                            <div class="form-group">
+                                <label>State</label>
+                                <input type="text" id="state" placeholder="e.g., Oregon">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Growing Conditions</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Light Requirements</label>
+                                <select id="lightConditions">
+                                    <option value="">Select light...</option>
+                                    <option value="full-sun">Full Sun (6+ hours)</option>
+                                    <option value="partial-sun">Partial Sun (4-6 hours)</option>
+                                    <option value="partial-shade">Partial Shade (2-4 hours)</option>
+                                    <option value="full-shade">Full Shade (< 2 hours)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Soil Type</label>
+                                <select id="soilType">
+                                    <option value="">Select soil...</option>
+                                    <option value="clay">Clay</option>
+                                    <option value="sandy">Sandy</option>
+                                    <option value="loamy">Loamy</option>
+                                    <option value="peaty">Peaty</option>
+                                    <option value="chalky">Chalky</option>
+                                    <option value="silty">Silty</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Soil pH</label>
+                                <input type="text" id="soilPH" placeholder="e.g., 6.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Watering Frequency</label>
+                                <select id="wateringFrequency">
+                                    <option value="">Select frequency...</option>
+                                    <option value="daily">Daily</option>
+                                    <option value="every-2-days">Every 2 Days</option>
+                                    <option value="twice-weekly">Twice Weekly</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="bi-weekly">Bi-Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Care & Maintenance</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Fertilizer Type</label>
+                                <input type="text" id="fertilizerType" placeholder="e.g., 10-10-10 NPK">
+                            </div>
+                            <div class="form-group">
+                                <label>Fertilizer Schedule</label>
+                                <select id="fertilizerSchedule">
+                                    <option value="">Select schedule...</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="bi-weekly">Bi-Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="quarterly">Quarterly</option>
+                                    <option value="annually">Annually</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Pesticide Used</label>
+                                <input type="text" id="pesticide" placeholder="e.g., Neem oil">
+                            </div>
+                            <div class="form-group">
+                                <label>Herbicide Used</label>
+                                <input type="text" id="herbicide" placeholder="e.g., Organic mulch">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Photos</h2>
+                        <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+                            <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+                            <p style="color: #7f8c8d;">📷 Click to upload photos</p>
+                            <p style="color: #95a5a6; font-size: 0.9em; margin-top: 10px;">Upload multiple photos of your plant</p>
+                        </div>
+                        <div class="photo-preview" id="photoPreview"></div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2>Notes</h2>
+                        <div class="form-group">
+                            <textarea id="notes" placeholder="Add any additional notes about this plant..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="savePlant()">Save Plant</button>
+                        <button class="btn btn-secondary" onclick="cancelForm()">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="plant-detail" id="plantDetail">
+                    <!-- Plant details will be shown here -->
+                </div>
+            </div>
+            <!-- End Garden Section -->
+
+                <!-- Community Section -->
+                <div id="communitySection" class="community-section">
+                    <div class="community-content">
+                        <div class="community-header">
+                            <h2>🌍 Community Garden Forum</h2>
+                        </div>
+
+                        <div class="community-grid">
+                            <div class="community-left">
+                                <div class="new-post-form">
+                                    <h3>Share Your Garden</h3>
+                                    <div class="form-group">
+                                        <label>Post Title</label>
+                                        <input type="text" id="postTitle" placeholder="e.g., My Beautiful Tomato Harvest!">
+                                    </div>
+                                    <div class="form-group" style="margin-top: 15px;">
+                                        <label>Description</label>
+                                        <textarea id="postDescription" placeholder="Share details about your garden, tips, or ask questions..." style="min-height: 100px;"></textarea>
+                                    </div>
+                                    <div class="form-group" style="margin-top: 15px;">
+                                        <label>Select Plants to Share (Optional)</label>
+                                        <select id="postPlantSelect" multiple style="height: 120px;">
+                                            <!-- Will be populated with user's plants -->
+                                        </select>
+                                        <p style="color: #7f8c8d; font-size: 0.85em; margin-top: 5px;">Hold Ctrl/Cmd to select multiple plants</p>
+                                    </div>
+                                    <div class="button-group">
+                                        <button class="btn btn-primary" onclick="createCommunityPost()">Share to Community</button>
+                                        <button class="btn btn-secondary" onclick="cancelCommunityPost()">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="community-right">
+                                <div class="community-posts" id="communityPosts">
+                                    <!-- Posts will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // 🔥 FIREBASE CONFIGURATION - ADD YOUR CONFIG HERE!
+        // ============================================================================
+        // 
+        // STEP 1: Go to https://console.firebase.google.com
+        // STEP 2: Create a project (or select existing)
+        // STEP 3: Click ⚙️ Settings → Project settings
+        // STEP 4: Scroll to "Your apps" section
+        // STEP 5: Copy your firebaseConfig and paste it below
+        //
+        // STEP 6: Uncomment the lines below and replace with YOUR config:
+        //
+        // const firebaseConfig = {
+      apiKey: "YOUR-API-KEY-HERE",
+      authDomain: "YOUR-PROJECT.firebaseapp.com",
+      projectId: "YOUR-PROJECT-ID",
+      storageBucket: "YOUR-PROJECT.appspot.com",
+      messagingSenderId: "YOUR-SENDER-ID",
+      appId: "YOUR-APP-ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+        //
+        // firebase.initializeApp(firebaseConfig);
+        // const auth = firebase.auth();
+        // const db = firebase.firestore();
+        // const storage = firebase.storage();
+        //
+        // For full setup guide, see FIREBASE_SETUP_GUIDE.md
+        // ============================================================================
+
+        let plants = [];
+        let currentPlant = null;
+        let uploadedPhotos = [];
+        let communityPosts = [];
+        let currentUser = null;
+
+        // Authentication Functions
+        function loadCurrentUser() {
+            const stored = localStorage.getItem('currentUser');
+            if (stored) {
+                currentUser = JSON.parse(stored);
+                renderUserProfile();
+            } else {
+                renderLoginButton();
+            }
+        }
+
+        function renderUserProfile() {
+            const userProfile = document.getElementById('userProfile');
+            if (currentUser) {
+                userProfile.innerHTML = `
+                    <span style="font-weight: 600;">${currentUser.username}</span>
+                    <div class="user-avatar" onclick="toggleUserDropdown()">
+                        ${currentUser.username.charAt(0).toUpperCase()}
+                    </div>
+                `;
+            }
+        }
+
+        function renderLoginButton() {
+            const userProfile = document.getElementById('userProfile');
+            userProfile.innerHTML = `
+                <button class="login-btn" onclick="showAuthModal()">Login / Sign Up</button>
+            `;
+        }
+
+        function showAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            clearAuthForms();
+        }
+
+        function switchAuthTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = document.querySelectorAll('.auth-form');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('signupForm').classList.add('active');
+            }
+        }
+
+        function clearAuthForms() {
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('signupUsername').value = '';
+            document.getElementById('signupEmail').value = '';
+            document.getElementById('signupPassword').value = '';
+            document.getElementById('signupConfirmPassword').value = '';
+        }
+
+        function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+
+            // Get stored users
+            const users = JSON.parse(localStorage.getItem('gardenUsers') || '{}');
+            
+            if (users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    email: users[username].email
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                closeAuthModal();
+                renderUserProfile();
+                alert('Welcome back, ' + username + '!');
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        function handleSignup() {
+            const username = document.getElementById('signupUsername').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+            if (!username || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            // Get stored users
+            const users = JSON.parse(localStorage.getItem('gardenUsers') || '{}');
+            
+            if (users[username]) {
+                alert('Username already exists. Please choose another.');
+                return;
+            }
+
+            // Store new user
+            users[username] = {
+                email: email,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+            localStorage.setItem('gardenUsers', JSON.stringify(users));
+
+            // Auto login
+            currentUser = {
+                username: username,
+                email: email
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            closeAuthModal();
+            renderUserProfile();
+            alert('Account created successfully! Welcome, ' + username + '!');
+        }
+
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function viewProfile() {
+            toggleUserDropdown();
+            alert('Profile page coming soon!');
+        }
+
+        function viewSettings() {
+            toggleUserDropdown();
+            alert('Settings page coming soon!');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                toggleUserDropdown();
+                renderLoginButton();
+                alert('You have been logged out successfully');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const avatar = document.querySelector('.user-avatar');
+            if (dropdown && !dropdown.contains(event.target) && event.target !== avatar) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('authModal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeAuthModal();
+            }
+        });
+
+        // Load plants from localStorage
+        function loadPlants() {
+            const stored = localStorage.getItem('gardenPlants');
+            if (stored) {
+                plants = JSON.parse(stored);
+                renderPlantList();
+            }
+        }
+
+        // Save plants to localStorage
+        function savePlantsToStorage() {
+            localStorage.setItem('gardenPlants', JSON.stringify(plants));
+        }
+
+        // Community Forum Functions
+        function loadCommunityPosts() {
+            const stored = localStorage.getItem('communityPosts');
+            if (stored) {
+                communityPosts = JSON.parse(stored);
+            } else {
+                // Add some sample posts
+                communityPosts = [
+                    {
+                        id: Date.now() - 10000,
+                        author: 'GardenGuru',
+                        title: 'My First Successful Tomato Harvest! 🍅',
+                        description: 'After months of care, I finally harvested 50+ tomatoes from my backyard garden. The key was consistent watering and using compost tea every two weeks!',
+                        plants: [],
+                        photos: [],
+                        likes: 24,
+                        date: new Date(Date.now() - 86400000 * 2).toISOString(),
+                        likedBy: [],
+                        comments: [
+                            {
+                                id: Date.now() - 9000,
+                                author: 'TomatoFan',
+                                text: 'Wow, that\'s amazing! What variety did you grow?',
+                                date: new Date(Date.now() - 86400000 * 1).toISOString()
+                            }
+                        ]
+                    },
+                    {
+                        id: Date.now() - 20000,
+                        author: 'PlantLover23',
+                        title: 'Question: Best herbs for beginners?',
+                        description: "I'm new to gardening and want to start with herbs. What are the easiest herbs to grow indoors? I have a sunny window in my kitchen.",
+                        plants: [],
+                        photos: [],
+                        likes: 12,
+                        date: new Date(Date.now() - 86400000 * 5).toISOString(),
+                        likedBy: [],
+                        comments: [
+                            {
+                                id: Date.now() - 19000,
+                                author: 'HerbMaster',
+                                text: 'Basil and mint are super easy! Just don\'t overwater them.',
+                                date: new Date(Date.now() - 86400000 * 4).toISOString()
+                            }
+                        ]
+                    }
+                ];
+                localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
+            }
+        }
+
+        function showAddPlantForm() {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('plantForm').classList.add('active');
+            document.getElementById('plantDetail').classList.remove('active');
+            clearForm();
+        }
+
+        function editPlant(id) {
+            const plant = plants.find(p => p.id === id);
+            if (!plant) return;
+
+            currentPlant = plant;
+            
+            // Populate form with existing data
+            document.getElementById('plantName').value = plant.name || '';
+            document.getElementById('plantType').value = plant.type || '';
+            document.getElementById('plantLifecycle').value = plant.lifecycle || '';
+            document.getElementById('plantingDate').value = plant.plantingDate || '';
+            document.getElementById('hardinessZone').value = plant.hardinessZone || '';
+            document.getElementById('city').value = plant.city || '';
+            document.getElementById('state').value = plant.state || '';
+            document.getElementById('lightConditions').value = plant.lightConditions || '';
+            document.getElementById('soilType').value = plant.soilType || '';
+            document.getElementById('soilPH').value = plant.soilPH || '';
+            document.getElementById('wateringFrequency').value = plant.wateringFrequency || '';
+            document.getElementById('fertilizerType').value = plant.fertilizerType || '';
+            document.getElementById('fertilizerSchedule').value = plant.fertilizerSchedule || '';
+            document.getElementById('pesticide').value = plant.pesticide || '';
+            document.getElementById('herbicide').value = plant.herbicide || '';
+            document.getElementById('notes').value = plant.notes || '';
+            
+            // Show existing photos
+            uploadedPhotos = plant.photos ? [...plant.photos] : [];
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '';
+            uploadedPhotos.forEach(photo => {
+                const img = document.createElement('img');
+                img.src = photo;
+                preview.appendChild(img);
+            });
+
+            // Show form and update heading
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('plantDetail').classList.remove('active');
+            document.getElementById('plantForm').classList.add('active');
+            
+            // Change the form heading to indicate editing
+            const formHeading = document.querySelector('#plantForm > h2');
+            formHeading.textContent = 'Edit Plant';
+        }
+
+        function cancelForm() {
+            document.getElementById('plantForm').classList.remove('active');
+            if (plants.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+            } else {
+                showPlantDetail(plants[0]);
+            }
+        }
+
+        function clearForm() {
+            currentPlant = null;
+            document.getElementById('plantName').value = '';
+            document.getElementById('plantType').value = '';
+            document.getElementById('plantLifecycle').value = '';
+            document.getElementById('plantingDate').value = '';
+            document.getElementById('hardinessZone').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('lightConditions').value = '';
+            document.getElementById('soilType').value = '';
+            document.getElementById('soilPH').value = '';
+            document.getElementById('wateringFrequency').value = '';
+            document.getElementById('fertilizerType').value = '';
+            document.getElementById('fertilizerSchedule').value = '';
+            document.getElementById('pesticide').value = '';
+            document.getElementById('herbicide').value = '';
+            document.getElementById('notes').value = '';
+            document.getElementById('photoPreview').innerHTML = '';
+            uploadedPhotos = [];
+            
+            // Reset form heading
+            const formHeading = document.querySelector('#plantForm > h2');
+            if (formHeading) formHeading.textContent = 'Add New Plant';
+        }
+
+        function handlePhotoUpload(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('photoPreview');
+            
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos.push(e.target.result);
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function savePlant() {
+            const plantName = document.getElementById('plantName').value;
+            
+            if (!plantName) {
+                alert('Please enter a plant name');
+                return;
+            }
+
+            const plantData = {
+                name: plantName,
+                type: document.getElementById('plantType').value,
+                lifecycle: document.getElementById('plantLifecycle').value,
+                plantingDate: document.getElementById('plantingDate').value,
+                hardinessZone: document.getElementById('hardinessZone').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+                lightConditions: document.getElementById('lightConditions').value,
+                soilType: document.getElementById('soilType').value,
+                soilPH: document.getElementById('soilPH').value,
+                wateringFrequency: document.getElementById('wateringFrequency').value,
+                fertilizerType: document.getElementById('fertilizerType').value,
+                fertilizerSchedule: document.getElementById('fertilizerSchedule').value,
+                pesticide: document.getElementById('pesticide').value,
+                herbicide: document.getElementById('herbicide').value,
+                notes: document.getElementById('notes').value,
+                photos: [...uploadedPhotos]
+            };
+
+            if (currentPlant && currentPlant.id) {
+                // Editing existing plant
+                const index = plants.findIndex(p => p.id === currentPlant.id);
+                if (index !== -1) {
+                    plants[index] = {
+                        ...plants[index],
+                        ...plantData
+                    };
+                    currentPlant = plants[index];
+                }
+            } else {
+                // Creating new plant
+                const plant = {
+                    ...plantData,
+                    id: Date.now(),
+                    maintenanceLog: [],
+                    dateAdded: new Date().toISOString()
+                };
+                plants.push(plant);
+                currentPlant = plant;
+            }
+
+            savePlantsToStorage();
+            renderPlantList();
+            showPlantDetail(currentPlant);
+        }
+
+        function renderPlantList() {
+            const plantList = document.getElementById('plantList');
+            plantList.innerHTML = '';
+
+            plants.forEach(plant => {
+                const item = document.createElement('div');
+                item.className = 'plant-item';
+                
+                item.innerHTML = `
+                    <div onclick="showPlantDetail(plants.find(p => p.id === ${plant.id}))" style="cursor: pointer; flex: 1;">
+                        <h3>${plant.name}</h3>
+                        <p>${plant.type || 'Unknown type'}${plant.lifecycle ? ' • ' + plant.lifecycle : ''} • ${plant.city ? plant.city + ', ' : ''}${plant.state || ''}</p>
+                    </div>
+                    <button onclick="sharePlantToCommunity(${plant.id}); event.stopPropagation();" 
+                            style="background: #2ecc71; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.9em; margin-top: 8px; width: 100%;"
+                            onmouseover="this.style.background='#27ae60'" 
+                            onmouseout="this.style.background='#2ecc71'">
+                        📤 Share to Community
+                    </button>
+                `;
+                
+                plantList.appendChild(item);
+            });
+        }
+
+        function showPlantDetail(plant) {
+            currentPlant = plant;
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('plantForm').classList.remove('active');
+            document.getElementById('plantDetail').classList.add('active');
+
+            const detail = document.getElementById('plantDetail');
+            
+            const lightLabel = {
+                'full-sun': 'Full Sun (6+ hours)',
+                'partial-sun': 'Partial Sun (4-6 hours)',
+                'partial-shade': 'Partial Shade (2-4 hours)',
+                'full-shade': 'Full Shade (< 2 hours)'
+            };
+
+            const wateringLabel = {
+                'daily': 'Daily',
+                'every-2-days': 'Every 2 Days',
+                'twice-weekly': 'Twice Weekly',
+                'weekly': 'Weekly',
+                'bi-weekly': 'Bi-Weekly',
+                'monthly': 'Monthly'
+            };
+
+            detail.innerHTML = `
+                <div class="detail-header">
+                    <h2>${plant.name}</h2>
+                    <div class="detail-actions">
+                        <button class="btn-icon" onclick="sharePlantToCommunity(${plant.id})">📤 Share</button>
+                        <button class="btn-icon" onclick="editPlant(${plant.id})">✏️ Edit</button>
+                        <button class="btn-icon" onclick="deletePlant(${plant.id})">🗑️ Delete</button>
+                    </div>
+                </div>
+
+                ${plant.photos && plant.photos.length > 0 ? `
+                    <div class="photo-preview" style="margin-bottom: 30px;">
+                        ${plant.photos.map(photo => `<img src="${photo}" alt="Plant photo">`).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="info-grid">
+                    ${plant.type ? `<div class="info-card"><h4>Type</h4><p>${plant.type}</p></div>` : ''}
+                    ${plant.lifecycle ? `<div class="info-card"><h4>Lifecycle</h4><p>${plant.lifecycle}</p></div>` : ''}
+                    ${plant.plantingDate ? `<div class="info-card"><h4>Planted</h4><p>${new Date(plant.plantingDate).toLocaleDateString()}</p></div>` : ''}
+                    ${plant.hardinessZone ? `<div class="info-card"><h4>Hardiness Zone</h4><p>Zone ${plant.hardinessZone}</p></div>` : ''}
+                    ${plant.city || plant.state ? `<div class="info-card"><h4>Location</h4><p>${plant.city ? plant.city + ', ' : ''}${plant.state || ''}</p></div>` : ''}
+                    ${plant.lightConditions ? `<div class="info-card"><h4>Light</h4><p>${lightLabel[plant.lightConditions] || plant.lightConditions}</p></div>` : ''}
+                    ${plant.soilType ? `<div class="info-card"><h4>Soil Type</h4><p>${plant.soilType}</p></div>` : ''}
+                    ${plant.soilPH ? `<div class="info-card"><h4>Soil pH</h4><p>${plant.soilPH}</p></div>` : ''}
+                    ${plant.wateringFrequency ? `<div class="info-card"><h4>Watering</h4><p>${wateringLabel[plant.wateringFrequency] || plant.wateringFrequency}</p></div>` : ''}
+                    ${plant.fertilizerType ? `<div class="info-card"><h4>Fertilizer</h4><p>${plant.fertilizerType}</p></div>` : ''}
+                    ${plant.fertilizerSchedule ? `<div class="info-card"><h4>Fertilizer Schedule</h4><p>${plant.fertilizerSchedule}</p></div>` : ''}
+                    ${plant.pesticide ? `<div class="info-card"><h4>Pesticide</h4><p>${plant.pesticide}</p></div>` : ''}
+                    ${plant.herbicide ? `<div class="info-card"><h4>Herbicide</h4><p>${plant.herbicide}</p></div>` : ''}
+                </div>
+
+                ${plant.notes ? `
+                    <div class="info-card" style="margin-top: 20px;">
+                        <h4>Notes</h4>
+                        <p style="white-space: pre-wrap;">${plant.notes}</p>
+                    </div>
+                ` : ''}
+
+                <div class="maintenance-log">
+                    <h3>📝 Maintenance Log</h3>
+                    <div id="logEntries">
+                        ${plant.maintenanceLog.map(log => `
+                            <div class="log-entry">
+                                <div class="log-entry-date">${new Date(log.date).toLocaleDateString()} at ${new Date(log.date).toLocaleTimeString()}</div>
+                                <div class="log-entry-text">${log.text}</div>
+                            </div>
+                        `).join('')}
+                        ${plant.maintenanceLog.length === 0 ? '<p style="color: #7f8c8d; text-align: center; padding: 20px;">No maintenance logs yet</p>' : ''}
+                    </div>
+                    <button class="add-log-btn" onclick="addMaintenanceLog()">+ Add Log Entry</button>
+                </div>
+            `;
+
+            // Update active state in sidebar
+            document.querySelectorAll('.plant-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const items = document.querySelectorAll('.plant-item');
+            const index = plants.findIndex(p => p.id === plant.id);
+            if (items[index]) {
+                items[index].classList.add('active');
+            }
+        }
+
+        function addMaintenanceLog() {
+            const text = prompt('Enter maintenance activity:');
+            if (text) {
+                currentPlant.maintenanceLog.unshift({
+                    date: new Date().toISOString(),
+                    text: text
+                });
+                savePlantsToStorage();
+                showPlantDetail(currentPlant);
+            }
+        }
+
+        function deletePlant(id) {
+            if (confirm('Are you sure you want to delete this plant?')) {
+                plants = plants.filter(p => p.id !== id);
+                savePlantsToStorage();
+                renderPlantList();
+                
+                if (plants.length === 0) {
+                    document.getElementById('plantDetail').classList.remove('active');
+                    document.getElementById('emptyState').style.display = 'block';
+                } else {
+                    showPlantDetail(plants[0]);
+                }
+            }
+        }
+
+        // Initialize
+        loadCurrentUser();
+        loadPlants();
+        loadCommunityPosts();
+        if (plants.length > 0) {
+            showPlantDetail(plants[0]);
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            const gardenSection = document.getElementById('gardenSection');
+            const communitySection = document.getElementById('communitySection');
+            const sidebar = document.getElementById('gardenSidebar');
+            const tabs = document.querySelectorAll('.nav-tab');
+
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (tab === 'garden') {
+                gardenSection.style.display = 'block';
+                communitySection.classList.remove('active');
+                sidebar.style.display = 'block';
+                tabs[0].classList.add('active');
+            } else {
+                gardenSection.style.display = 'none';
+                communitySection.classList.add('active');
+                sidebar.style.display = 'none';
+                tabs[1].classList.add('active');
+                populatePlantSelect();
+                renderCommunityPosts();
+            }
+        }
+
+        function populatePlantSelect() {
+            const select = document.getElementById('postPlantSelect');
+            select.innerHTML = plants.map(plant => 
+                `<option value="${plant.id}">${plant.name} (${plant.type || 'Unknown'})</option>`
+            ).join('');
+        }
+
+        function createCommunityPost() {
+            console.log('createCommunityPost called');
+            
+            const titleInput = document.getElementById('postTitle');
+            const descInput = document.getElementById('postDescription');
+            const select = document.getElementById('postPlantSelect');
+            
+            console.log('Title input:', titleInput);
+            console.log('Desc input:', descInput);
+            console.log('Select:', select);
+            
+            if (!titleInput || !descInput || !select) {
+                alert('Error: Could not find form elements. Please refresh the page.');
+                return;
+            }
+            
+            const title = titleInput.value.trim();
+            const description = descInput.value.trim();
+            const selectedPlantIds = Array.from(select.selectedOptions).map(opt => parseInt(opt.value));
+
+            console.log('Title:', title);
+            console.log('Description:', description);
+            console.log('Selected plant IDs:', selectedPlantIds);
+
+            if (!title || !description) {
+                alert('Please enter a title and description for your post');
+                return;
+            }
+
+            const selectedPlants = plants.filter(p => selectedPlantIds.includes(p.id));
+            const postPhotos = selectedPlants.flatMap(p => p.photos || []).slice(0, 4);
+
+            console.log('Selected plants:', selectedPlants);
+            console.log('Post photos:', postPhotos);
+
+            const post = {
+                id: Date.now(),
+                author: currentUser ? currentUser.username : 'Anonymous',
+                title: title,
+                description: description,
+                plants: selectedPlants.map(p => ({
+                    name: p.name,
+                    type: p.type,
+                    lifecycle: p.lifecycle
+                })),
+                photos: postPhotos,
+                likes: 0,
+                date: new Date().toISOString(),
+                likedBy: [],
+                comments: []
+            };
+
+            console.log('Creating post:', post);
+
+            communityPosts.unshift(post);
+            localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
+            
+            console.log('Post added to communityPosts. Total posts:', communityPosts.length);
+            
+            // Clear form
+            titleInput.value = '';
+            descInput.value = '';
+            select.selectedIndex = -1;
+
+            // Show success message
+            const form = document.querySelector('.new-post-form');
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = 'background: #2ecc71; color: white; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center; font-weight: bold;';
+            successMsg.textContent = '✅ Post shared successfully to the community!';
+            form.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+
+            console.log('About to render posts...');
+            renderCommunityPosts();
+        }
+
+        function cancelCommunityPost() {
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postDescription').value = '';
+            document.getElementById('postPlantSelect').selectedIndex = -1;
+        }
+
+        function renderCommunityPosts() {
+            console.log('renderCommunityPosts called');
+            const postsContainer = document.getElementById('communityPosts');
+            console.log('Posts container:', postsContainer);
+            console.log('Community posts array:', communityPosts);
+            
+            if (!postsContainer) {
+                console.error('Could not find communityPosts element!');
+                return;
+            }
+            
+            if (communityPosts.length === 0) {
+                postsContainer.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 50px;">No posts yet. Be the first to share your garden!</p>';
+                return;
+            }
+
+            postsContainer.innerHTML = communityPosts.map(post => `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-avatar">${post.author.charAt(0).toUpperCase()}</div>
+                        <div class="post-info">
+                            <div class="post-author">${post.author}</div>
+                            <div class="post-date">
+                                ${new Date(post.date).toLocaleDateString()} at ${new Date(post.date).toLocaleTimeString()}
+                                ${post.edited ? '<span style="color: #95a5a6; font-size: 0.85em;"> • edited</span>' : ''}
+                            </div>
+                        </div>
+                        ${currentUser && post.author === currentUser.username ? `
+                            <div style="margin-left: auto; display: flex; gap: 8px;">
+                                <button onclick="editPost(${post.id})" style="
+                                    background: #3498db;
+                                    color: white;
+                                    border: none;
+                                    padding: 8px 16px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-size: 0.9em;
+                                    min-height: 36px;
+                                ">✏️ Edit</button>
+                                <button onclick="deletePost(${post.id})" style="
+                                    background: #e74c3c;
+                                    color: white;
+                                    border: none;
+                                    padding: 8px 16px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-size: 0.9em;
+                                    min-height: 36px;
+                                ">🗑️ Delete</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="post-content">
+                        <div class="post-title">${post.title}</div>
+                        <div class="post-text">${post.description}</div>
+                        ${post.photos && post.photos.length > 0 ? `
+                            <div class="post-images">
+                                ${post.photos.map(photo => `<img src="${photo}" alt="Garden photo">`).join('')}
+                            </div>
+                        ` : ''}
+                        ${post.plants && post.plants.length > 0 ? `
+                            <div class="post-tags">
+                                ${post.plants.map(plant => `<span class="post-tag">🌱 ${plant.name}${plant.lifecycle ? ' (' + plant.lifecycle + ')' : ''}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn ${post.likedBy && currentUser && post.likedBy.includes(currentUser.username) ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                            ${post.likedBy && currentUser && post.likedBy.includes(currentUser.username) ? '❤️' : '🤍'} ${post.likes} ${post.likes === 1 ? 'Like' : 'Likes'}
+                        </button>
+                        <button class="post-action-btn" onclick="toggleComments(${post.id})">
+                            💬 ${post.comments ? post.comments.length : 0} ${post.comments && post.comments.length === 1 ? 'Comment' : 'Comments'}
+                        </button>
+                        <button class="post-action-btn">📤 Share</button>
+                    </div>
+                    <div class="comments-section" id="comments-${post.id}">
+                        <div id="comments-list-${post.id}">
+                            ${post.comments && post.comments.length > 0 ? post.comments.map(comment => `
+                                <div class="comment">
+                                    <div class="comment-header">
+                                        <span class="comment-author">${comment.author}</span>
+                                        <span class="comment-date">${new Date(comment.date).toLocaleDateString()}</span>
+                                    </div>
+                                    <div class="comment-text">${comment.text}</div>
+                                </div>
+                            `).join('') : '<p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px;">No comments yet. Be the first to comment!</p>'}
+                        </div>
+                        <div class="comment-input-wrapper">
+                            <input type="text" class="comment-input" id="comment-input-${post.id}" placeholder="Write a comment...">
+                            <button class="comment-submit-btn" onclick="addComment(${post.id})">Post</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log('Posts rendered successfully');
+        }
+
+        function toggleLike(postId) {
+            const post = communityPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            const username = currentUser ? currentUser.username : 'Anonymous';
+            const userLikedIndex = post.likedBy.indexOf(username);
+            
+            if (userLikedIndex > -1) {
+                post.likedBy.splice(userLikedIndex, 1);
+                post.likes--;
+            } else {
+                post.likedBy.push(username);
+                post.likes++;
+            }
+
+            localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
+            renderCommunityPosts();
+        }
+
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            if (commentsSection) {
+                commentsSection.classList.toggle('active');
+                // Focus on the input if opening
+                if (commentsSection.classList.contains('active')) {
+                    setTimeout(() => {
+                        const input = document.getElementById(`comment-input-${postId}`);
+                        if (input) input.focus();
+                    }, 100);
+                }
+            }
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            if (!input) return;
+
+            const commentText = input.value.trim();
+            if (!commentText) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            const post = communityPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            // Initialize comments array if it doesn't exist
+            if (!post.comments) {
+                post.comments = [];
+            }
+
+            const comment = {
+                id: Date.now(),
+                author: currentUser ? currentUser.username : 'Anonymous',
+                text: commentText,
+                date: new Date().toISOString()
+            };
+
+            post.comments.push(comment);
+            localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
+            
+            // Re-render to show the new comment
+            renderCommunityPosts();
+            
+            // Re-open the comments section
+            toggleComments(postId);
+        }
+
+        function editPost(postId) {
+            const post = communityPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            // Check if user owns this post
+            if (!currentUser || post.author !== currentUser.username) {
+                alert('You can only edit your own posts');
+                return;
+            }
+
+            // Populate the form with existing post data
+            document.getElementById('postTitle').value = post.title;
+            document.getElementById('postDescription').value = post.description;
+
+            // Pre-select the plants if they exist in the current user's garden
+            const select = document.getElementById('postPlantSelect');
+            if (select && post.plants) {
+                for (let option of select.options) {
+                    const plantId = parseInt(option.value);
+                    const plant = plants.find(p => p.id === plantId);
+                    if (plant && post.plants.some(pp => pp.name === plant.name)) {
+                        option.selected = true;
+                    }
+                }
+            }
+
+            // Store the post ID we're editing
+            window.editingPostId = postId;
+
+            // Change button text and function
+            const submitBtn = document.querySelector('.new-post-form .btn-primary');
+            submitBtn.textContent = 'Update Post';
+            submitBtn.onclick = () => updatePost(postId);
+
+            // Add a cancel button if not already there
+            const cancelBtn = document.querySelector('.new-post-form .btn-secondary');
+            cancelBtn.textContent = 'Cancel Edit';
+            cancelBtn.onclick = cancelEditPost;
+
+            // Highlight the form
+            const form = document.querySelector('.new-post-form');
+            form.style.border = '3px solid #3498db';
+            
+            // Scroll to form
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function updatePost(postId) {
+            const post = communityPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            const title = document.getElementById('postTitle').value.trim();
+            const description = document.getElementById('postDescription').value.trim();
+
+            if (!title || !description) {
+                alert('Please enter a title and description');
+                return;
+            }
+
+            // Update the post
+            post.title = title;
+            post.description = description;
+            post.edited = true;
+            post.editedDate = new Date().toISOString();
+
+            // Update plants if selected
+            const select = document.getElementById('postPlantSelect');
+            const selectedPlantIds = Array.from(select.selectedOptions).map(opt => parseInt(opt.value));
+            const selectedPlants = plants.filter(p => selectedPlantIds.includes(p.id));
+            
+            post.plants = selectedPlants.map(p => ({
+                name: p.name,
+                type: p.type,
+                lifecycle: p.lifecycle
+            }));
+            
+            post.photos = selectedPlants.flatMap(p => p.photos || []).slice(0, 4);
+
+            localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
+
+            // Reset the form
+            cancelEditPost();
+
+            // Show success message
+            const form = document.querySelector('.new-post-form');
+            const successMsg = document.createElement('div');
+            successMsg.style.cssText = 'background: #3498db; color: white; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center; font-weight: bold;';
+            successMsg.textContent = '✅ Post updated successfully!';
+            form.appendChild(successMsg);
+            
+            setTimeout(() => {
+                successMsg.remove();
+            }, 3000);
+
+            renderCommunityPosts();
+        }
+
+        function cancelEditPost() {
+            // Clear the form
+            document.getElementById('postTitle').value = '';
+            document.getElementById('postDescription').value = '';
+            document.getElementById('postPlantSelect').selectedIndex = -1;
+
+            // Reset button
+            const submitBtn = document.querySelector('.new-post-form .btn-primary');
+            submitBtn.textContent = 'Share to Community';
+            submitBtn.onclick = createCommunityPost;
+
+            const cancelBtn = document.querySelector('.new-post-form .btn-secondary');
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.onclick = cancelCommunityPost;
+
+            // Remove border highlight
+            const form = document.querySelector('.new-post-form');
+            form.style.border = '';
+
+            // Clear editing flag
+            window.editingPostId = null;
+        }
+
+        function deletePost(postId) {
+            const post = communityPosts.find(p => p.id === postId);
+            if (!post) return;
+
+            // Check if user owns this post
+            if (!currentUser || post.author !== currentUser.username) {
+                alert('You can only delete your own posts');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete "${post.title}"? This cannot be undone.`)) {
+                communityPosts = communityPosts.filter(p => p.id !== postId);
+                localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
+                renderCommunityPosts();
+
+                // Show success message
+                const container = document.getElementById('communityPosts');
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = 'background: #e74c3c; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;';
+                successMsg.textContent = '🗑️ Post deleted successfully';
+                container.insertBefore(successMsg, container.firstChild);
+                
+                setTimeout(() => {
+                    successMsg.remove();
+                }, 3000);
+            }
+        }
+
+        function sharePlantToCommunity(plantId) {
+            const plant = plants.find(p => p.id === plantId);
+            if (!plant) return;
+
+            // Switch to community tab
+            switchTab('community');
+
+            // Small delay to ensure the DOM is ready
+            setTimeout(() => {
+                // Pre-fill the post form with plant information
+                const titleInput = document.getElementById('postTitle');
+                const descInput = document.getElementById('postDescription');
+                const select = document.getElementById('postPlantSelect');
+
+                if (titleInput) titleInput.value = `Check out my ${plant.name}!`;
+                if (descInput) {
+                    descInput.value = `I wanted to share my ${plant.name}${plant.lifecycle ? ' (' + plant.lifecycle + ')' : ''}. ${plant.notes || 'Growing beautifully in my garden!'}`;
+                }
+                
+                // Pre-select the plant
+                if (select) {
+                    for (let option of select.options) {
+                        if (parseInt(option.value) === plantId) {
+                            option.selected = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Highlight the form briefly
+                const form = document.querySelector('.new-post-form');
+                if (form) {
+                    form.style.border = '3px solid #2ecc71';
+                    setTimeout(() => {
+                        form.style.border = '';
+                    }, 2000);
+
+                    // Scroll to the post form
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallBanner();
+        });
+
+        function showInstallBanner() {
+            // Only show if not already installed
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                return;
+            }
+
+            const banner = document.createElement('div');
+            banner.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                animation: slideUp 0.3s ease-out;
+            `;
+            
+            banner.innerHTML = `
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; font-size: 1.1em; margin-bottom: 5px;">🌱 Install Garden Tracker</div>
+                    <div style="font-size: 0.9em; opacity: 0.95;">Add to your home screen for quick access!</div>
+                </div>
+                <button onclick="installPWA()" style="
+                    background: white;
+                    color: #27ae60;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    min-height: 44px;
+                ">Install</button>
+                <button onclick="dismissInstallBanner()" style="
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                    border: none;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    min-height: 44px;
+                ">✕</button>
+            `;
+            
+            document.body.appendChild(banner);
+            window.installBanner = banner;
+
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideUp {
+                    from {
+                        transform: translateY(100px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        window.installPWA = async function() {
+            if (!deferredPrompt) {
+                showInstallInstructions();
+                return;
+            }
+
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('App installed');
+            }
+            
+            deferredPrompt = null;
+            dismissInstallBanner();
+        };
+
+        window.dismissInstallBanner = function() {
+            if (window.installBanner) {
+                window.installBanner.remove();
+                localStorage.setItem('installBannerDismissed', 'true');
+            }
+        };
+
+        function showInstallInstructions() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            let instructions = '';
+            
+            if (isIOS) {
+                instructions = `
+                    <strong>To install on iOS:</strong><br><br>
+                    1. Tap the Share button in Safari<br>
+                    2. Scroll down and tap "Add to Home Screen"<br>
+                    3. Tap "Add" in the top right
+                `;
+            } else if (isAndroid) {
+                instructions = `
+                    <strong>To install on Android:</strong><br><br>
+                    1. Tap the menu button (⋮) in your browser<br>
+                    2. Tap "Add to Home screen" or "Install app"<br>
+                    3. Follow the prompts
+                `;
+            } else {
+                instructions = `
+                    <strong>To install:</strong><br><br>
+                    Look for an install icon in your browser's address bar,<br>
+                    or check your browser's menu for "Install" options.
+                `;
+            }
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.6);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 15px;
+                    max-width: 400px;
+                    line-height: 1.8;
+                ">
+                    <h3 style="margin-top:0;color:#2c3e50;">Install Garden Tracker</h3>
+                    <p style="color:#34495e;">${instructions}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        width: 100%;
+                        padding: 12px;
+                        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin-top: 15px;
+                        min-height: 48px;
+                    ">Got it!</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Show install banner for iOS after 10 seconds if not dismissed before
+        setTimeout(() => {
+            if (!localStorage.getItem('installBannerDismissed') && !window.matchMedia('(display-mode: standalone)').matches) {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if (isIOS && !deferredPrompt) {
+                    showInstallBanner();
+                }
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
