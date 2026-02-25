@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1047,7 +1048,23 @@
                         <label>Password</label>
                         <input type="password" id="loginPassword" placeholder="Enter your password">
                     </div>
-                    <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 20px;">Login</button>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <a href="#" onclick="showForgotPassword(); return false;" style="color: #2ecc71; text-decoration: none; font-size: 0.9em;">Forgot Password?</a>
+                    </div>
+                    <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 15px;">Login</button>
+                </div>
+
+                <!-- Forgot Password Form -->
+                <div class="auth-form" id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="resetEmail" placeholder="Enter your email address">
+                        <p style="font-size: 0.85em; color: #7f8c8d; margin-top: 8px;">We'll send you a password reset link</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="handlePasswordReset()" style="width: 100%; margin-top: 20px;">Send Reset Link</button>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="#" onclick="backToLogin(); return false;" style="color: #2ecc71; text-decoration: none; font-size: 0.9em;">← Back to Login</a>
+                    </div>
                 </div>
 
                 <!-- Signup Form -->
@@ -1340,21 +1357,19 @@
         //
         // STEP 6: Uncomment the lines below and replace with YOUR config:
         //
-const firebaseConfig = {
-  apiKey: "AIzaSyBw4zqX9xrU5eEwZMoMY-E_jnXj_XSbuZ4",
-  authDomain: "garden-tracker-d513a.firebaseapp.com",
-  projectId: "garden-tracker-d513a",
-  storageBucket: "garden-tracker-d513a.firebasestorage.app",
-  messagingSenderId: "1068479878601",
-  appId: "1:1068479878601:web:f23cb2f55f5d6d5be6c418"
-};
-
- 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
+        // const firebaseConfig = {
+        //   apiKey: "YOUR-API-KEY",
+        //   authDomain: "your-project.firebaseapp.com",
+        //   projectId: "your-project-id",
+        //   storageBucket: "your-project.appspot.com",
+        //   messagingSenderId: "123456789",
+        //   appId: "1:123456789:web:abc123"
+        // };
+        //
+        // firebase.initializeApp(firebaseConfig);
+        // const auth = firebase.auth();
+        // const db = firebase.firestore();
+        // const storage = firebase.storage();
         //
         // For full setup guide, see FIREBASE_SETUP_GUIDE.md
         // ============================================================================
@@ -1483,6 +1498,94 @@ const firebaseConfig = {
                 alert('Username already exists. Please choose another.');
                 return;
             }
+
+            // Store new user
+            users[username] = {
+                email: email,
+                password: password,
+                createdAt: new Date().toISOString()
+            };
+            localStorage.setItem('gardenUsers', JSON.stringify(users));
+
+            // Auto login
+            currentUser = {
+                username: username,
+                email: email
+            };
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            closeAuthModal();
+            renderUserProfile();
+            alert('Account created successfully! Welcome, ' + username + '!');
+        }
+
+        function showForgotPassword() {
+            const forms = document.querySelectorAll('.auth-form');
+            forms.forEach(f => f.classList.remove('active'));
+            document.getElementById('forgotPasswordForm').classList.add('active');
+            
+            // Update modal title
+            document.querySelector('#authModal h2').textContent = 'Reset Password';
+            
+            // Hide tabs
+            document.querySelector('.auth-tabs').style.display = 'none';
+        }
+
+        function backToLogin() {
+            const forms = document.querySelectorAll('.auth-form');
+            forms.forEach(f => f.classList.remove('active'));
+            document.getElementById('loginForm').classList.add('active');
+            
+            // Restore modal title
+            document.querySelector('#authModal h2').textContent = 'Welcome to Garden Tracker';
+            
+            // Show tabs
+            document.querySelector('.auth-tabs').style.display = 'flex';
+            
+            // Reset login tab as active
+            const tabs = document.querySelectorAll('.auth-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            tabs[0].classList.add('active');
+            
+            // Clear reset email field
+            document.getElementById('resetEmail').value = '';
+        }
+
+        function handlePasswordReset() {
+            const email = document.getElementById('resetEmail').value.trim();
+            
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            // Check if email exists in stored users
+            const users = JSON.parse(localStorage.getItem('gardenUsers') || '{}');
+            const userExists = Object.values(users).some(user => user.email === email);
+            
+            if (!userExists) {
+                // For security, don't reveal if email exists or not
+                alert('If an account exists with this email, you will receive a password reset link shortly.');
+                document.getElementById('resetEmail').value = '';
+                backToLogin();
+                return;
+            }
+            
+            // In a real Firebase implementation, this would call:
+            // firebase.auth().sendPasswordResetEmail(email)
+            
+            // For now, show success message
+            alert('Password reset link sent! Check your email (Note: Email functionality requires Firebase Authentication to be fully configured)');
+            document.getElementById('resetEmail').value = '';
+            backToLogin();
+        }
 
             // Store new user
             users[username] = {
@@ -2576,3 +2679,4 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+Added forgot passwrod feature
