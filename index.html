@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1346,32 +1345,23 @@
 
     <script>
         // ============================================================================
-        // 🔥 FIREBASE CONFIGURATION - ADD YOUR CONFIG HERE!
+        // 🔥 FIREBASE CONFIGURATION
         // ============================================================================
-        // 
-        // STEP 1: Go to https://console.firebase.google.com
-        // STEP 2: Create a project (or select existing)
-        // STEP 3: Click ⚙️ Settings → Project settings
-        // STEP 4: Scroll to "Your apps" section
-        // STEP 5: Copy your firebaseConfig and paste it below
-        //
-        // STEP 6: Uncomment the lines below and replace with YOUR config:
-        //
+        
         const firebaseConfig = {
-  apiKey: "AIzaSyBw4zqX9xrU5eEw2WoMY-E_inXj_XSbuZQ",
-  authDomain: "garden-tracker-d513a.firebaseapp.com",
-  projectId: "garden-tracker-d513a",
-  storageBucket: "garden-tracker-d513a.firebasestorage.app",
-  messagingSenderId: "106847987860l",
-  appId: "1:106847987860:web:f23cb2f55f5d65be6c418"
-};
+          apiKey: "AIzaSyBw4zqX9xrU5eEw2WoMY-E_inXj_XSbuZQ",
+          authDomain: "garden-tracker-d513a.firebaseapp.com",
+          projectId: "garden-tracker-d513a",
+          storageBucket: "garden-tracker-d513a.firebasestorage.app",
+          messagingSenderId: "106847987860l",
+          appId: "1:106847987860:web:f23cb2f55f5d65be6c418"
+        };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-        //
-        // For full setup guide, see FIREBASE_SETUP_GUIDE.md
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
         // ============================================================================
 
         let plants = [];
@@ -1703,7 +1693,7 @@ const storage = firebase.storage();
                             {
                                 id: Date.now() - 19000,
                                 author: 'HerbMaster',
-                                text: 'Basil and mint are super easy! Just don\'t overwater them.',
+                                text: "Basil and mint are super easy! Just don't overwater them.",
                                 date: new Date(Date.now() - 86400000 * 4).toISOString()
                             }
                         ]
