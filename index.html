@@ -1370,6 +1370,14 @@
         let communityPosts = [];
         let currentUser = null;
 
+        // Admin users who can edit/delete all posts
+        const ADMIN_USERS = ['daletuftee', 'admin', 'moderator'];
+        
+        // Helper function to check if user is admin
+        function isAdmin() {
+            return currentUser && ADMIN_USERS.includes(currentUser.username.toLowerCase());
+        }
+
         // Authentication Functions
         function loadCurrentUser() {
             const stored = localStorage.getItem('currentUser');
@@ -2132,8 +2140,19 @@
                                 ${post.edited ? '<span style="color: #95a5a6; font-size: 0.85em;"> • edited</span>' : ''}
                             </div>
                         </div>
-                        ${currentUser && post.author === currentUser.username ? `
+                        ${currentUser && (post.author === currentUser.username || isAdmin()) ? `
                             <div style="margin-left: auto; display: flex; gap: 8px;">
+                                ${isAdmin() && post.author !== currentUser.username ? `
+                                    <span style="
+                                        background: #9b59b6;
+                                        color: white;
+                                        padding: 4px 10px;
+                                        border-radius: 4px;
+                                        font-size: 0.75em;
+                                        margin-right: 8px;
+                                        align-self: center;
+                                    ">👑 ADMIN</span>
+                                ` : ''}
                                 <button onclick="editPost(${post.id})" style="
                                     background: #3498db;
                                     color: white;
@@ -2275,8 +2294,8 @@
             const post = communityPosts.find(p => p.id === postId);
             if (!post) return;
 
-            // Check if user owns this post
-            if (!currentUser || post.author !== currentUser.username) {
+            // Check if user owns this post OR is an admin
+            if (!currentUser || (post.author !== currentUser.username && !isAdmin())) {
                 alert('You can only edit your own posts');
                 return;
             }
@@ -2302,7 +2321,7 @@
 
             // Change button text and function
             const submitBtn = document.querySelector('.new-post-form .btn-primary');
-            submitBtn.textContent = 'Update Post';
+            submitBtn.textContent = isAdmin() && post.author !== currentUser.username ? 'Update Post (Admin)' : 'Update Post';
             submitBtn.onclick = () => updatePost(postId);
 
             // Add a cancel button if not already there
@@ -2312,7 +2331,7 @@
 
             // Highlight the form
             const form = document.querySelector('.new-post-form');
-            form.style.border = '3px solid #3498db';
+            form.style.border = isAdmin() && post.author !== currentUser.username ? '3px solid #9b59b6' : '3px solid #3498db';
             
             // Scroll to form
             form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2395,13 +2414,18 @@
             const post = communityPosts.find(p => p.id === postId);
             if (!post) return;
 
-            // Check if user owns this post
-            if (!currentUser || post.author !== currentUser.username) {
+            // Check if user owns this post OR is an admin
+            if (!currentUser || (post.author !== currentUser.username && !isAdmin())) {
                 alert('You can only delete your own posts');
                 return;
             }
 
-            if (confirm(`Are you sure you want to delete "${post.title}"? This cannot be undone.`)) {
+            const isAdminDelete = isAdmin() && post.author !== currentUser.username;
+            const confirmMessage = isAdminDelete 
+                ? `[ADMIN ACTION] Are you sure you want to delete "${post.title}" by ${post.author}? This cannot be undone.`
+                : `Are you sure you want to delete "${post.title}"? This cannot be undone.`;
+
+            if (confirm(confirmMessage)) {
                 communityPosts = communityPosts.filter(p => p.id !== postId);
                 localStorage.setItem('communityPosts', JSON.stringify(communityPosts));
                 renderCommunityPosts();
@@ -2409,8 +2433,10 @@
                 // Show success message
                 const container = document.getElementById('communityPosts');
                 const successMsg = document.createElement('div');
-                successMsg.style.cssText = 'background: #e74c3c; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;';
-                successMsg.textContent = '🗑️ Post deleted successfully';
+                successMsg.style.cssText = isAdminDelete 
+                    ? 'background: #9b59b6; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;'
+                    : 'background: #e74c3c; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold;';
+                successMsg.textContent = isAdminDelete ? '👑 Post deleted by admin' : '🗑️ Post deleted successfully';
                 container.insertBefore(successMsg, container.firstChild);
                 
                 setTimeout(() => {
